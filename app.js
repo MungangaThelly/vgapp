@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const connectDB = require('./src/config/db'); // Databaskoppling
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const userRoutes = require('./src/routes/userRoutes'); // Användarrutter
 
 const app = express();
