@@ -1,14 +1,13 @@
-const express = require('express')
-const requireAuth = require('../middleware/authMiddleware')
-const router = express.Router()
+const express = require('express');
+const requireAuth = require('../middleware/authMiddleware');
+const router = express.Router();
 
-// En skyddad enpoint. Notera att vi har requireAuth som ett argument i funktionen. 
-
+// Protected endpoint that requires the user to be authenticated
 router.get('/protected', requireAuth, (req, res) => {
   res.status(200).json({
     message: 'Welcome to the protected route',
-    user: req.user
-  }) 
-})
+    user: req.user // Attach the decoded user info from the JWT token
+  });
+});
 
-module.exports = router
+module.exports = router;
