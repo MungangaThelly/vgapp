@@ -1,4 +1,5 @@
 require('dotenv').config();  // Läs in miljövariabler från .env
+
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -6,6 +7,7 @@ const connectDB = require('./src/config/db'); // Databaskoppling
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userRoutes = require('./src/routes/userRoutes'); // Användarrutter
+const protectedRoutes = require('./src/routes/protectedRoutes')
 
 const app = express();
 const port = 5000;
@@ -19,6 +21,7 @@ connectDB();
 
 // Använd användarrutter
 app.use('/api', userRoutes);
+app.use('/api/protected', protectedRoutes)
 
 // Global felhantering
 app.use((err, req, res, next) => {
