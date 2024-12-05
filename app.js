@@ -26,6 +26,15 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Något gick fel!', error: err.message });
 });
 
+app.get('/api/protected', (req, res) => {
+  if (!req.headers.authorization) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+  // Handle protected logic here
+  res.json({ message: 'You are authorized!' });
+});
+
+
 // Starta servern
 app.listen(port, () => {
   console.log(`Servern kör på port ${port}`);

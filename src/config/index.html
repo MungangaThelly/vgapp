@@ -29,35 +29,79 @@
   <div id="result"></div>
 
   <script>
-    const API_URL = 'http://localhost:5000'; // Backend API URL
+    const API_URL = 'http://localhost:5000/api'; // Backend API URL
 
     // Handle user creation
     document.getElementById('createUserForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
+  e.preventDefault();
 
-      const response = await fetch(`${API_URL}/users`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username, password })
-      });
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
 
-      const result = await response.json();
-      document.getElementById('result').innerHTML = `User created: ${JSON.stringify(result)}`;
+  try {
+    const response = await fetch(`${API_URL}/users`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username, password })
     });
+
+    // If the response is not OK, throw an error
+    if (!response.ok) {
+      throw new Error('Failed to create user');
+    }
+
+    const result = await response.json();
+
+    // Display user data in a readable format
+    document.getElementById('result').innerHTML = `
+      <h3>User Created Successfully</h3>
+      <p><strong>ID:</strong> ${result._id}</p>
+      <p><strong>Username:</strong> ${result.username}</p>
+      <p><strong>Created At:</strong> ${new Date(result.createdAt).toLocaleString()}</p>
+    `;
+  } catch (error) {
+    // Display error message if something goes wrong
+    document.getElementById('result').innerHTML = `
+      <p style="color: red;">Error: ${error.message}</p>
+    `;
+  }
+});
+
 
     // Handle fetching a user by ID
     document.getElementById('getUserBtn').addEventListener('click', async () => {
-      const userId = document.getElementById('userId').value;
+  const userId = document.getElementById('userId').value;
+  
+  try {
+    const response = await fetch(`${API_URL}/users/${userId}`);
+    
+    // Check if the response is successful
+    if (!response.ok) {
+      throw new Error('User not found or there was an error');
+    }
 
-      const response = await fetch(`${API_URL}/users/${userId}`);
-      const result = await response.json();
-      document.getElementById('result').innerHTML = `User data: ${JSON.stringify(result)}`;
-    });
+    const result = await response.json();
+
+    // Assuming result contains user data like username, _id, etc.
+    // Display the data in a readable format
+    document.getElementById('result').innerHTML = `
+      <h3>User Information</h3>
+      <p><strong>ID:</strong> ${result._id}</p>
+      <p><strong>Username:</strong> ${result.username}</p>
+      <p><strong>Email:</strong> ${result.email || 'N/A'}</p>
+      <p><strong>Created At:</strong> ${new Date(result.createdAt).toLocaleString()}</p>
+    `;
+  } catch (error) {
+    document.getElementById('result').innerHTML = `
+      <p style="color: red;">Error: ${error.message}</p>
+    `;
+  }
+});
+
   </script>
 
 </body>
 </html>
+
