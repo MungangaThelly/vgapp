@@ -4,6 +4,23 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const router = express.Router();
 
+// Middleware to authenticate JWT token
+function authenticateToken(req, res, next) {
+  const token = req.header('Authorization')?.split(' ')[1];  // Get the token from the Authorization header
+  if (!token) {
+    return res.status(403).json({ message: 'Access denied' });
+  }
+
+  // Verify the token
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+    req.user = user; // Store the decoded user data in the request object
+    next(); // Proceed to the next middleware or route handler
+  });
+}
+
 // Skapa användare
 router.post('/users', async (req, res) => {
   try {
@@ -29,8 +46,8 @@ router.post('/users', async (req, res) => {
   }
 });
 
-// Hämta alla användare
-router.get('/users', async (req, res) => {
+// Hämta alla användare (protected route)
+router.get('/users', authenticateToken, async (req, res) => {
   try {
     const users = await User.find();
     res.status(200).json(users); // Returnera alla användare
@@ -39,8 +56,8 @@ router.get('/users', async (req, res) => {
   }
 });
 
-// Hämta användare via ID
-router.get('/users/:id', async (req, res) => {
+// Hämta användare via ID (protected route)
+router.get('/users/:id', authenticateToken, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -52,8 +69,8 @@ router.get('/users/:id', async (req, res) => {
   }
 });
 
-// Uppdatera användare
-router.put('/users/:id', async (req, res) => {
+// Uppdatera användare (protected route)
+router.put('/users/:id', authenticateToken, async (req, res) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id, 
@@ -71,8 +88,8 @@ router.put('/users/:id', async (req, res) => {
   }
 });
 
-// Ta bort användare
-router.delete('/users/:id', async (req, res) => {
+// Ta bort användare (protected route)
+router.delete('/users/:id', authenticateToken, async (req, res) => {
   try {
     const result = await User.deleteOne({ _id: req.params.id });
     if (result.deletedCount === 0) {
